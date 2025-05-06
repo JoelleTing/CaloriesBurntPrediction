@@ -6,7 +6,12 @@ import pickle
 st.title('Calories Burnt Prediction')
 
 # Load the model
-model = pickle.load(open('calories_burnt_model.pkl', 'rb'))  # Change path if needed
+try:
+    model = pickle.load(open('calories_burnt_model.pkl', 'rb'))
+except FileNotFoundError as e:
+    st.error(f"Error: Model file 'calories_burnt_model.pkl' not found. "
+             f"Please ensure it is in the same directory as app.py.")
+    st.stop()
 
 # Input fields
 gender = st.selectbox('Gender', ['male', 'female'])
@@ -23,5 +28,8 @@ gender = 1 if gender == 'male' else 0
 # Prediction button
 if st.button('Predict Calories'):
     input_data = np.array([[gender, age, height, weight, duration, heart_rate, body_temp]])
-    prediction = model.predict(input_data)[0]
-    st.success(f'Predicted Calories Burnt: {prediction:.2f}')
+    try:
+        prediction = model.predict(input_data)[0]
+        st.success(f'Predicted Calories Burnt: {prediction:.2f}')
+    except Exception as e:
+        st.error(f"Error during prediction: {e}")
